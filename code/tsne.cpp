@@ -48,8 +48,7 @@ namespace TSNE
     template<>
     ostream & operator<<(ostream & os, const vector<double> &a);
 
-
-    // for a matrix divided by float
+    // for a matrix divided by a float number
     template<class T>
     void operator/=(vector<T> &a, double b);
 
