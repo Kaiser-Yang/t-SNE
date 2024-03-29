@@ -15,10 +15,10 @@ Visualization of the `t-SNE` process with `Python`.
 
 # NOTE
 
-* If you build with out `cmake`, you can use `g++ tsne.cpp -o tsne --std=c++17 -O3 -DNDEBUG`;
-* If your platform is `UNIK-like`, you can use `bash start.sh` run this code automatically, otherwise, you can run as the `start.sh` does;
-* Make sure your working directory is `code/` to make finding data with relative paths possible;
-* The execution of `tsne` takes a long duration, so you should wait patiently, or you can update all `n`s, which means the number of samples, in `.py` to run on less data, the default `n` is `6000`;
+* If you build `tsne` without `cmake`, you can use `g++ tsne.cpp -o tsne --std=c++17 -O3 -DNDEBUG` command;
+* If your platform is `UNIK-like`, you can use `bash start.sh` to build and run this code automatically, otherwise, you can execute commands as the `start.sh` does;
+* Make sure your working directory of every script and `tsne` is `code/` to make finding data with relative paths possible;
+* The execution of `tsne` takes a long duration, so you are supposed to wait patiently, or you can update all `n`s, which means the number of samples, in `*.py` to run on less data, the default `n` is `6000`;
 
 # POSSIBLE IMPROVEMENT
 
@@ -26,6 +26,6 @@ Visualization of the `t-SNE` process with `Python`.
 
 # RESULT
 
-The result of one random experiment:
+The result of one random experiment (this figure is a `gif` file, which makes it possible to restart by saving it or opening it in a new tab) :
 
 ![result](./result.gif)
