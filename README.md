@@ -24,7 +24,7 @@ Visualization of the `t-SNE` process with `Python`.
 
 * There are many symmetric calculation in formulas with i and j, so we just need calculate half elements of a matrix, such as the code calculating joint probability $p_{ij}$ of the input data:
 
-  ```cpp
+  ```c++
   for (int i = 0; i < n; i++) {
       for (int j = i + 1; j < n; j++) {
           p[i][j] = p[j][i] = max(1e-100, (output[i][j] + output[j][i]) / (2 * n)) * EXAGGERATION;
@@ -34,7 +34,7 @@ Visualization of the `t-SNE` process with `Python`.
 
 * Try not to copy from a matrix, such as the code of method `operator+=`, which update elements of a matrix directly:
 
-  ```cpp
+  ```c++
   template<class T>
   void operator+=(vector<T> &a, const vector<T> &b)
   {
@@ -44,7 +44,7 @@ Visualization of the `t-SNE` process with `Python`.
 
 * Where is a $\sigma_i$, there is a $\frac{1}{2\sigma_i^2}$. Therefore, we just need calculate $\frac{1}{2\sigma_i^2}$ rather than $\sigma_i$, such as the code calculating the conditional probability $p_{j\vert i}$ of input data ( `(*doubleSigmaSquareInverse)[i]`means $\frac{1}{2\sigma_i^2}$ exactly):
 
-  ```cpp
+  ```c++
   double piSum = 0;
   for (int i = 0; i < x.size(); i++) {
       piSum = 0;
@@ -59,7 +59,7 @@ Visualization of the `t-SNE` process with `Python`.
 
 * There are many results that will be used more than one time, such as the `L2` of input data. Therefore we can calculate once and restore them for future use, such as the code calculating `L2` of input data:
 
-  ```cpp
+  ```c++
   if (disSquare.empty()) {
       disSquare.resize(x.size(), vector<double>(x.size()));
       double normSquare = 0;
