@@ -4,3 +4,5 @@ code/build
 code/*cache*
 code/result.gif
 project.*
+.ipynb_checkpoints
+projectImages
