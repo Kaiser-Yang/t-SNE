@@ -15,7 +15,7 @@ namespace TSNE
     // m : the dimension of every sample
     // y ：the result after t-SNE
     // outputDimension : the dimension of result y
-    // epoch : the num of iterations
+    // epoch : the number of iterations
     // perp : perplexity, usually chosen in [5, 50], and it must be less than n
     // x : samples, x[i] means the i-th sample
     // g : gradient
@@ -24,9 +24,10 @@ namespace TSNE
     // q : joint probability of result y
     // learningRate : laerning rate
     // lastY : the last y, for momentum gradient descent
-    // l, r : the left boundary and the right boundary, for binary search to get 1 / (2 sigma^2)
-    // ymean : the mean number of y, for centralization
-    // doubleSigmaSquareInverse : 1 / (2 sigma^2)
+    // yMean : the mean number of y, for centralization
+    // l, r : the left boundary and the right boundary,
+    //        for binary search to get 1 / (2*sigma^2)
+    // doubleSigmaSquareInverse : 1 / (2*sigma^2)
     int n, m, outputDimension, epoch;
     double perp;
     constexpr double eps = 1e-7;
@@ -35,7 +36,7 @@ namespace TSNE
     vector<vector<double>> x, p;
     vector<vector<double>> *q;
     vector<vector<double>> y, g, lastY, gain;
-    vector<double> ymean;
+    vector<double> yMean;
     vector<double> doubleSigmaSquareInverse, l, r;
 
     // for generating Gauss Distribution number
@@ -68,14 +69,14 @@ namespace TSNE
             const vector<double> *doubleSigmaSquareInverse;
             vector<vector<double>> disSquare;
 
-            void setDoubleSigmaSquareInverse(const vector<double>& doubleSigmaSquareInverse)
+            void setDoubleSigmaSquareInverse(const vector<double>& value)
             {
-                this->doubleSigmaSquareInverse = &doubleSigmaSquareInverse;
+                this->doubleSigmaSquareInverse = &value;
             }
 
             vector<vector<double>> & operator()(vector<vector<double>> x)
             {
-                // we only calculate norm(x[i] - x[j]) ^ 2 once
+                // we only calculate norm(x[i] - x[j])^2 once
                 if (disSquare.empty()) {
                     disSquare.resize(x.size(), vector<double>(x.size()));
                     double normSquare = 0;
@@ -83,23 +84,30 @@ namespace TSNE
                         for (int j = i + 1; j < x.size(); j++) {
                             normSquare = 0;
                             assert(x[i].size() == x[j].size());
-                            for (int k = 0; k < x[i].size(); k++) { normSquare += pow(x[i][k] - x[j][k], 2); }
+                            for (int k = 0; k < x[i].size(); k++) {
+                                normSquare += pow(x[i][k] - x[j][k], 2);
+                            }
                             disSquare[i][j] = disSquare[j][i] = normSquare;
                         }
                     }
                 }
-                if (output.empty()) { output.resize(x.size(), vector<double>(x.size())); }
+                if (output.empty()) {
+                    output.resize(x.size(), vector<double>(x.size()));
+                }
                 // calculate pj|i, output[i][j] is pj|i
                 double piSum = 0;
                 for (int i = 0; i < x.size(); i++) {
                     piSum = 0;
                     for (int j = 0; j < x.size(); j++) {
                         if (j == i) { continue; }
-                        output[i][j] = exp(-disSquare[i][j] * (*doubleSigmaSquareInverse)[i]);
+                        output[i][j] = exp(-disSquare[i][j] *
+                                           (*doubleSigmaSquareInverse)[i]);
                         piSum += output[i][j];
                     }
                     assert(piSum > eps);
-                    for (int j = 0; j < x.size(); j++) { output[i][j] /= piSum; }
+                    for (int j = 0; j < x.size(); j++) {
+                        output[i][j] /= piSum;
+                    }
                 }
                 return output;
             }
@@ -124,11 +132,14 @@ namespace TSNE
                 double h = 0;
                 for (int i = 0; i < x.size(); i++) {
                     h = 0;
-                    for (int j = 0; j < x.size(); j++) { if (x[i][j] > eps) { h -= x[i][j] * log2(x[i][j]); } }
+                    for (int j = 0; j < x.size(); j++) {
+                        if (x[i][j] > eps) { h -= x[i][j] * log2(x[i][j]); }
+                    }
                     output[i] = h;
                 }
                 return output;
             }
+
             void init() { output.clear(); }
         } h;
 
@@ -148,9 +159,9 @@ namespace TSNE
             void init() { output.clear(); }
         } perp;
 
-        void setDoubleSigmaSquareInverse(const vector<double> &doubleSigmaSquareInverse)
+        void setDoubleSigmaSquareInverse(const vector<double> &value)
         {
-            p.setDoubleSigmaSquareInverse(doubleSigmaSquareInverse);
+            p.setDoubleSigmaSquareInverse(value);
         }
 
         vector<double> & operator()(const vector<vector<double>> &x)
@@ -175,18 +186,23 @@ namespace TSNE
 
         vector<vector<double>> & operator()(const vector<vector<double>> &x)
         {
-            // disSquarePlusInverse stores 1 / (1 + ||xi - xj|| ^ 2) to reuse in calculating gradient
+            // disSquarePlusInverse stores 1 / (1 + ||xi - xj||^2)
+            // this will be reused when calculating gradient
             if (disSquarePlusInverse.empty()) {
                 disSquarePlusInverse.resize(x.size(), vector<double>(x.size()));
             }
-            if (output.empty()) { output.resize(x.size(), vector<double>(x.size())); }
+            if (output.empty()) {
+                output.resize(x.size(), vector<double>(x.size()));
+            }
             double qSum = 0;
             double normSquare = 0;
             for (int i = 0; i < x.size(); i++) {
                 for (int j = i + 1; j < x.size(); j++) {
                     normSquare = 0;
                     assert(x[i].size() == x[j].size());
-                    for (int k = 0; k < x[i].size(); k++) { normSquare += pow(x[i][k] - x[j][k], 2); }
+                    for (int k = 0; k < x[i].size(); k++) {
+                        normSquare += pow(x[i][k] - x[j][k], 2);
+                    }
                     output[i][j] = output[j][i]
                                  = disSquarePlusInverse[i][j]
                                  = disSquarePlusInverse[j][i]
@@ -197,7 +213,8 @@ namespace TSNE
             assert(qSum > eps);
             for (int i = 0; i < x.size(); i++) {
                 for (int j = i + 1; j < x.size(); j++) {
-                    output[i][j] = output[j][i] = max(output[i][j] / qSum, 1e-100);
+                    output[i][j] = output[j][i] = max(output[i][j] / qSum,
+                                                      1e-100);
                 }
             }
             return output;
@@ -209,7 +226,7 @@ namespace TSNE
         }
     } qLayer;
 
-    // binary search to get 1 / (2 sigma^2)
+    // binary search to get 1 / (2*sigma^2)
     void getDoubleSigmaSquareInverse()
     {
         perpNet.setDoubleSigmaSquareInverse(r);
@@ -224,11 +241,15 @@ namespace TSNE
         perpNet.setDoubleSigmaSquareInverse(doubleSigmaSquareInverse);
         assert(r.size() > 0 && l.size() > 0);
         while (r[0] - l[0] >= eps) {
-            for (int i = 0; i < n; i++) { doubleSigmaSquareInverse[i] = (l[i] + r[i]) / 2; }
-            // get Perp with now 1 / (2 sigma^2)
+            for (int i = 0; i < n; i++) {
+                doubleSigmaSquareInverse[i] = (l[i] + r[i]) / 2;
+            }
+            // get Perp with current 1 / (2*sigma^2)
             auto &&perp = perpNet(x);
             for (int i = 0; i < n; i++) {
-                if (perp[i] < TSNE::perp) { r[i] = doubleSigmaSquareInverse[i]; }
+                if (perp[i] < TSNE::perp) {
+                    r[i] = doubleSigmaSquareInverse[i];
+                }
                 else { l[i] = doubleSigmaSquareInverse[i]; }
             }
         }
@@ -242,8 +263,11 @@ namespace TSNE
             fill(g[i].begin(), g[i].end(), 0);
             for (int j = 0; j < n; j++) {
                 // this scale is to prevent re-calculation
-                scale = 4 * (p[i][j] - (*q)[i][j]) * qLayer.disSquarePlusInverse[i][j];
-                for (int d = 0; d < outputDimension; d++) { g[i][d] += scale * (y[i][d] - y[j][d]); }
+                scale = 4 * (p[i][j] - (*q)[i][j]) *
+                        qLayer.disSquarePlusInverse[i][j];
+                for (int d = 0; d < outputDimension; d++) {
+                    g[i][d] += scale * (y[i][d] - y[j][d]);
+                }
             }
         }
     }
@@ -260,25 +284,29 @@ namespace TSNE
             // calculate joint probability of current result y
             q = &qLayer(y);
             getGradient();
-            fill(ymean.begin(), ymean.end(), 0);
+            fill(yMean.begin(), yMean.end(), 0);
             for (int i = 0; i < n; i++) {
                 for (int d = 0; d < outputDimension; d++) {
                     // update learning rate adaptively
-                    // we don't update learningRate variable; we use learningRate * gain[i][d] as the new learning rate
-                    gain[i][d] = max(sign(g[i][d]) == sign(lastY[i][d]) ? gain[i][d] * 0.8 : gain[i][d] + 0.2, 0.01);
+                    // we don't update learningRate variable
+                    // we use learningRate * gain[i][d] as the new learning rate
+                    gain[i][d] = max(sign(g[i][d]) == sign(lastY[i][d]) ?
+                                 gain[i][d] * 0.8 :
+                                 gain[i][d] + 0.2, 0.01);
                     // get step
-                    step = momentum * (y[i][d] - lastY[i][d]) - learningRate * gain[i][d] * g[i][d];
+                    step = momentum * (y[i][d] - lastY[i][d]) -
+                           learningRate * gain[i][d] * g[i][d];
                     lastY[i][d] = y[i][d];
                     y[i][d] += step;
                     // for centralization
-                    ymean[d] += y[i][d];
+                    yMean[d] += y[i][d];
                 }
             }
-            for (int d = 0; d < outputDimension; d++) { ymean[d] /= n; }
+            for (int d = 0; d < outputDimension; d++) { yMean[d] /= n; }
             // centralization
             for (int i = 0; i < n; i++) {
                 for (int d = 0; d < outputDimension; d++) {
-                    y[i][d] -= ymean[d];
+                    y[i][d] -= yMean[d];
                 }
             }
             // output y after every iteration
@@ -321,8 +349,8 @@ namespace TSNE
         g.clear();
         g.resize(n, vector<double>(n));
 
-        ymean.clear();
-        ymean.resize(outputDimension);
+        yMean.clear();
+        yMean.resize(outputDimension);
 
         learningRate = 100;
 
@@ -341,7 +369,9 @@ namespace TSNE
         auto &&output = perpNet.p(x);
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
-                p[i][j] = p[j][i] = max(1e-100, (output[i][j] + output[j][i]) / (2 * n)) * EXAGGERATION;
+                p[i][j] = p[j][i] =
+                          max(1e-100, (output[i][j] + output[j][i]) / (2 * n)) *
+                          EXAGGERATION;
             }
         }
         // gradient descent with epoch and momentum scale
@@ -399,7 +429,8 @@ int main()
     }
     // run t-SNE
     run();
-    // this is neccesary, fclose will not flush the data that in the buffer of cout
+    // this is neccesary
+    // because fclose will not flush the data that in the buffer of cout
     cout.flush();
     fclose(in);
     fclose(out);

@@ -6,7 +6,7 @@ Visualization of the `t-SNE` process with `Python`.
 
 # ENVIRONMENT LIST
 
-* `cmake 3.0.0`  or later;
+* `cmake 3.8.0`  or later;
 * `python 3.8.0` or later;
 * `c++ compiler`  must support `C++17`;
 * `numpy, imageio, matplotlib, torch, sklearn` for your `python` is required;
