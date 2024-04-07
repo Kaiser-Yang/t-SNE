@@ -19,6 +19,7 @@ Visualization of the `t-SNE` process with `Python`.
 * If your platform is `UNIK-like`, you can use `bash start.sh` to build and run this code automatically, otherwise, you can execute commands as the `start.sh` does;
 * Make sure your working directory of every script and `tsne` is `code/` to make finding data with relative paths possible;
 * The execution of `tsne` takes a long duration, so you are supposed to wait patiently, or you can update all `n`s, which means the number of samples, in `*.py` to run on less data, the default `n` is `6000`;
+* I've added arguements for `start.sh`, and those are `n` and `epoch`. For example, `bash start.sh 600 250` means `600` samples and `250` iterations;
 
 # IMPLEMENTATION OPTIMIZATIONs
 
