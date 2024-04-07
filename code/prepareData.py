@@ -1,7 +1,9 @@
+#!/usr/bin/env python
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, ConcatDataset
 import numpy as np
 from sklearn.decomposition import PCA
+import sys
 
 def loadData(batchSize : int, path = "./data") -> DataLoader:
     trainData = datasets.MNIST(root = path, train = True, download = True, transform = transforms.ToTensor())
@@ -11,8 +13,14 @@ def loadData(batchSize : int, path = "./data") -> DataLoader:
 
 if __name__ == '__main__':
     n = 6000
-    outputDimension = 2
     epoch = 1000
+    if len(sys.argv) >= 2:
+        n = int(sys.argv[1])
+    print(f"set the number of samples be {n}.")
+    if len(sys.argv) >= 3:
+        epoch = int(sys.argv[2])
+    print(f"set the number of epoch be {epoch}.")
+    outputDimension = 2
     perp = 40
     dataLoader = loadData(n)
     item = enumerate(dataLoader)
