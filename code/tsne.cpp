@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <iostream>
-#include <math.h>
 #include <ostream>
 #include <vector>
 #include <cassert>
@@ -15,7 +14,8 @@ namespace TSNE
     // m : the dimension of every sample
     // y ：the result after t-SNE
     // outputDimension : the dimension of result y
-    // epoch : the number of iterations
+    // epoch : the number of iterations,
+    //         we'll use max(epoch, 250) as real epoch
     // perp : perplexity, usually chosen in [5, 50], and it must be less than n
     // x : samples, x[i] means the i-th sample
     // g : gradient
@@ -356,6 +356,8 @@ namespace TSNE
 
         gain.clear();
         gain.resize(n, vector<double>(outputDimension, 1.));
+
+        epoch = max(epoch, 250);
     }
 
     // run t-SNE
