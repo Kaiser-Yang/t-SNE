@@ -8,3 +8,6 @@ set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(tsne ${PROJECT_SOURCE_DIR}/tsne.cpp)
+
+target_include_directories(tsne PRIVATE ${PROJECT_SOURCE_DIR}/include)
+

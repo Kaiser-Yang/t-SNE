@@ -14,29 +14,42 @@ def loadData(batchSize : int, path = "./data") -> DataLoader:
 if __name__ == '__main__':
     n = 6000
     epoch = 1000
-    if len(sys.argv) >= 2:
+    argc = len(sys.argv)
+    enableRandomWalk = 0
+    if argc >= 2:
         n = int(sys.argv[1])
-    print(f"set the number of samples be {n}.")
-    if len(sys.argv) >= 3:
+    print(f"set the number of landmark samples be {n}.")
+    totalSampleNum = n
+    if argc >= 3:
         epoch = int(sys.argv[2])
     print(f"set the number of epoch be {epoch}.")
+    if argc >= 4:
+        enableRandomWalk = int(sys.argv[3])
+    if argc >= 5:
+        totalSampleNum = int(sys.argv[4])
+    if enableRandomWalk:
+        print(f"enable random walk with totalSampleNum: {totalSampleNum}, landmarkSampleNum: {n}")
+    print("preparing data...")
     outputDimension = 2
     perp = 40
-    dataLoader = loadData(n)
+    if enableRandomWalk:
+        perp = 30
+    dataLoader = loadData(totalSampleNum)
     item = enumerate(dataLoader)
     _, (img, label) = next(item)
     img = img.squeeze()
-    x = np.zeros((n, img.shape[1] * img.shape[2]))
-    for i in range(n):
+    x = np.zeros((totalSampleNum, img.shape[1] * img.shape[2]))
+    for i in range(totalSampleNum):
         x[i] = img[i].flatten()
     pca = PCA(n_components = 30)
     newX = pca.fit_transform(x)
     dataFile = open("data/data.in", "w")
     labelFile = open("data/label.txt", "w")
-    dataFile.writelines([str(newX.shape[0]) + '\n', str(newX.shape[1]) + '\n',
+    dataFile.writelines([str(n) + '\n', str(newX.shape[1]) + '\n',
                          str(outputDimension) + '\n', str(perp) + '\n',
-                         str(epoch) + '\n'])
-    for i in range(n):
+                         str(epoch) + '\n', str(enableRandomWalk) + '\n',
+                         str(totalSampleNum) + '\n'])
+    for i in range(totalSampleNum):
         xi = str(newX[i])
         xi = xi.replace('[', '')
         xi = xi.replace(']', '')
@@ -44,3 +57,4 @@ if __name__ == '__main__':
         labelFile.write(str(label[i].flatten().tolist()[0]) + "\n")
     dataFile.close()
     labelFile.close()
+    print("preparing data finished")

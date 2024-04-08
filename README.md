@@ -1,6 +1,6 @@
 # INTRODUCTION
 
-Implementation of [t-SNE](https://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) with `C++`.
+Implementation of [t-SNE](https://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) with `C++` (including the random walk version).
 
 Visualization of the `t-SNE` process with `Python`.
 
@@ -19,8 +19,11 @@ Visualization of the `t-SNE` process with `Python`.
 * If your platform is `UNIK-like`, you can use `bash start.sh` to build and run this code automatically, otherwise, you can execute commands as the `start.sh` does;
 * Make sure your working directory of every script and `tsne` is `code/` to make finding data with relative paths possible;
 * The execution of `tsne` takes a long duration, so you are supposed to wait patiently, or you can update all `n`s, which means the number of samples, in `*.py` to run on less data, the default `n` is `6000`;
-* I've added arguements for `start.sh`, and those are `n` and `epoch`. For example, `bash start.sh 600 250` means `600` samples and `250` iterations;
+* I've added arguements for `start.sh`, and those are `n`, `epoch`, `enableRandomWalk` and `totalSampleNum` in order.
+  * For example, `bash start.sh 6000 1000` means `6,000` samples and `1,000` iterations without random walk, which is default (same with `bash start.sh`); `bash start.sh 6000 1000 1 60000` means `6,000` samples will be showed (if you don't understrand this, you are supposed to read the random walk part of [t-SNE](https://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf)), `1,000` iterations, enable random walk and the number of total samples is `6,0000`
+  * If `enableRandomWalk` is `0` (the default value), you should not set `totalSampleNum` be not equal with `n`.
 * There is a typo in the pseudo code of [the origin paper](https://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf). Of the gradient descent part, there should be a minus rather than a plus, which should be $y_i^{t+1} = y_i^t - \eta \frac{\delta C}{\delta y_i} + \alpha(t) (y_i^t - y_i^{t - 1})$;
+* There are some output information when running t-SNE. The train process are seperated to `3` parts (`50` iterations, `200` iterations and `epoch - 250` iterations), so the train process rates are for every part in sequence.
 
 # IMPLEMENTATION OPTIMIZATIONs
 
@@ -76,15 +79,36 @@ if (disSquare.empty()) {
 }
 ```
 
+* In random walk, we limit the times of each turn to avoid random walk on a small circle for a long time:
+```c++
+if (nearestLandMark[start] == UNKNOWN) {
+    nearestLandMark[start] = getNearestLandMark(selectedID[start]);
+}
+if (nearestLandMark[start] == UNREACHABLE) { return UNREACHABLE; }
+int now = selectedID[start];
+int randomWalkTimes = randomWalkTimesEveryTurn;
+while (randomWalkTimes-- &&
+       (now == selectedID[start] || selectedIDMap.count(now) == 0)) {
+    now = randomWalkGraph[now][distribution[now](generator)].to;
+}
+if (selectedIDMap.count(now) == 0) {
+    return selectedIDMap[nearestLandMark[start]];
+}
+return selectedIDMap[now];
+```
+
 # POSSIBLE IMPROVEMENT
 
 * Using multi-thread to improve is obvious.
 
 # Future Work
-* Implementing t-SNE with random walk to train on bigger data sets.
+* ~~Implementing t-SNE with random walk to train on bigger data sets.~~(this has been implemented!)
 
 # RESULT
 
-The result of one random experiment (this figure is a `gif` file, which makes it possible to restart by saving it or opening it in a new tab) :
+The result of one random experiment without random walk(training on `6,000` MNIST images for `1,000` iteration, this figure is a `gif` file, which makes it possible to restart by saving it or opening it in a new tab) :
 
 ![result](./result.gif)
+
+The result of one random experiment (training on `6,000` MNIST images for `1,000` iteration, but using all `60,000` MNIST images with random walk, this figure is a `gif` file, which makes it possible to restart by saving it or opening it in a new tab):
+![result_random_walk](./result_random_walk.gif)

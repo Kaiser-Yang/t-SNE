@@ -2,7 +2,7 @@ code/fig
 code/data
 code/build
 code/*cache*
-code/result.gif
+code/*.gif
 project.*
 .ipynb_checkpoints
 projectImages
