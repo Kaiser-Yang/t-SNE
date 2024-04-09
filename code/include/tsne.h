@@ -19,7 +19,7 @@ namespace TSNE
     //                 when enableRandomWalk is 0, this should be same with n
     // perp: perplexity, usually chosen in [5, 50], and it must be less than n
     // learningRate: laerning rate, default value is 100
-    // enableRandomWalk: whether or not use random walk, thedefault value is 0
+    // enableRandomWalk: whether or not use random walk, the default value is 0
     // neighborNum: this variable is to find the neighborNum nearest neighbor,
     //              we will use min(round(perp), n-1) as neighborNum
     // randomWalkTimes: for every landmark, we random walk randomWalkTimes times
@@ -49,8 +49,8 @@ namespace TSNE
 
     // after setting all the variables that required, 
     // call TSNE::run() to start t-SNE
-    // outputFilename: the fileanme where y should be outputted
-    void run(const std::string &outputFilename = "data/data.out");
+    // outputFilename: the filename where y should be outputted
+    extern void run(const std::string &outputFilename = "data/data.out");
 }
 
 #endif
