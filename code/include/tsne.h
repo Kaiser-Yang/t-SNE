@@ -3,7 +3,7 @@
 #define TSNE_H
 
 #include <vector>
-#include <ostream>
+#include <string>
 
 namespace TSNE
 {
@@ -34,9 +34,8 @@ namespace TSNE
 
     // These variables below are configurable:
     // eps: precision for binary search, the default value is 1e-7
-    using std::vector, std::ostream;
     extern int n, m, outputDimension, epoch;
-    extern vector<vector<double>> totalSample;
+    extern std::vector<std::vector<double>> totalSample;
     extern double perp;
     extern int exaggeration;
     extern double learningRate;
@@ -44,7 +43,7 @@ namespace TSNE
     extern int totalSampleNum, neighborNum;
     extern int randomWalkTimes;
     extern int randomWalkTimesEveryTurn;
-    extern vector<vector<double>> y;
+    extern std::vector<std::vector<double>> y;
     extern double eps;
 
     // after setting all the variables that required, 

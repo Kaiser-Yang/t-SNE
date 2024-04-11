@@ -53,6 +53,7 @@ namespace TSNE
     // selectedID: selectedID[i] means the i-th landmark position in totalSample
     // selectedIDMap: selectedIDMap[selectedID[i]] = i
     // randomWalkGraph: store the graph for random walk
+    using std::vector, std::ostream;
     int n, m, outputDimension, epoch;
     double perp;
     double eps = 1e-7;
@@ -81,8 +82,6 @@ namespace TSNE
 
     // output y to file
     std::ofstream fileOutstream;
-
-    using std::max;
 
     // landmark state, nearestLandMark[id] means id's nearest landmark
     enum LANDMARK_STATE
@@ -249,8 +248,8 @@ namespace TSNE
             assert(qSum > 1e-100);
             for (int i = 0; i < x.size(); i++) {
                 for (int j = i + 1; j < x.size(); j++) {
-                    output[i][j] = output[j][i] = max(output[i][j] / qSum,
-                                                      1e-100);
+                    output[i][j] = output[j][i] = std::max(output[i][j] / qSum,
+                                                           1e-100);
                 }
             }
             return output;
@@ -332,9 +331,9 @@ namespace TSNE
                     // update learning rate adaptively
                     // we don't update learningRate variable
                     // we use learningRate * gain[i][d] as the new learning rate
-                    gain[i][d] = max(sign(g[i][d]) == sign(lastY[i][d]) ?
-                                 gain[i][d] * 0.8 :
-                                 gain[i][d] + 0.2, 0.01);
+                    gain[i][d] = std::max(sign(g[i][d]) == sign(lastY[i][d]) ?
+                                          gain[i][d] * 0.8 :
+                                          gain[i][d] + 0.2, 0.01);
                     // get step
                     step = momentum * (y[i][d] - lastY[i][d]) -
                            learningRate * gain[i][d] * g[i][d];
@@ -399,7 +398,7 @@ namespace TSNE
         if (enableRandomWalk) {
             neighborNum = std::min((int)round(perp), totalSampleNum - 1);
             randomWalkGraph.resize(totalSampleNum);
-            randomWalkTimesEveryTurn = max(randomWalkTimesEveryTurn, n);
+            randomWalkTimesEveryTurn = std::max(randomWalkTimesEveryTurn, n);
             nearestLandMark.resize(n, UNKNOWN);
         } else {
             perpNet.init();
@@ -441,7 +440,7 @@ namespace TSNE
         gain.clear();
         gain.resize(n, vector<double>(outputDimension, 1.));
 
-        epoch = max(epoch, 250);
+        epoch = std::max(epoch, 250);
 
         disSquare.resize(totalSampleNum, vector<double>(totalSampleNum));
     }
@@ -579,10 +578,10 @@ namespace TSNE
             std::fill(cnt.begin(), cnt.end(), 0);
             for (int j = 0; j < randomWalkTimes; j++) {
                 ret = randomWalk(i, generator, distribution);
-                if (ret == -1) { break; }
+                if (ret == UNREACHABLE) { break; }
                 cnt[ret]++;
             }
-            if (ret != -1) {
+            if (ret != UNREACHABLE) {
                 for (int j = 0; j < n; j++) {
                     p[i][j] = (double)cnt[j] / randomWalkTimes;
                 }
@@ -590,8 +589,9 @@ namespace TSNE
         }
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
-                p[i][j] = p[j][i] = max(1e-100, (p[i][j] + p[j][i]) / (2 * n)) *
-                                    exaggeration;
+                p[i][j] = p[j][i] = std::max(1e-100,
+                                             (p[i][j] + p[j][i]) / (2 * n)) *
+                                             exaggeration;
             }
         }
         endTime = clock();
@@ -611,9 +611,9 @@ namespace TSNE
         auto &&output = perpNet.p(x);
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
-                p[i][j] = p[j][i] =
-                        max(1e-100, (output[i][j] + output[j][i]) / (2 * n)) *
-                        exaggeration;
+                p[i][j] = p[j][i] = std::max(1e-100,
+                                             (output[i][j] + output[j][i]) / (2 * n)) *
+                                             exaggeration;
             }
         }
         clock_t endTime = clock();
@@ -643,12 +643,12 @@ namespace TSNE
         for (int i = 0; i < selectedID.size(); i++) {
             x[i].swap(totalSample[selectedID[i]]);
         }
+        fileOutstream.close();
         clock_t endTime = clock();
         std::cout << "time of run t-SNE: "
                   << (double)(endTime - startTime) / CLOCKS_PER_SEC
                   << " (s)"
                   << std::endl;
-        fileOutstream.close();
     }
 
     template<class T>
