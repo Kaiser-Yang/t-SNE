@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <bits/types/clock_t.h>
+#include <ctime>
 #include <fstream>
 #include <functional>
 #include <iostream>
