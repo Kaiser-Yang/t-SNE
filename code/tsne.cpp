@@ -117,7 +117,6 @@ namespace TSNE
         public:
             vector<vector<double>> output;
             const vector<double> *doubleSigmaSquareInverse;
-            // vector<vector<double>> disSquare;
 
             void setDoubleSigmaSquareInverse(const vector<double>& value)
             {
@@ -151,7 +150,6 @@ namespace TSNE
             {
                 output.clear();
                 doubleSigmaSquareInverse = nullptr;
-                // disSquare.clear();
             }
         } p;
         
