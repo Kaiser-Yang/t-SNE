@@ -152,7 +152,7 @@ namespace TSNE
                 doubleSigmaSquareInverse = nullptr;
             }
         } p;
-        
+
         // this class is for calculating H
         class HLayer
         {
