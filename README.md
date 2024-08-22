@@ -111,4 +111,5 @@ The result of one random experiment without random walk(training on `6,000` MNIS
 ![result](./result.gif)
 
 The result of one random experiment (training on `6,000` MNIST images for `1,000` iteration, but using all `60,000` MNIST images with random walk, this figure is a `gif` file, which makes it possible to restart by saving it or opening it in a new tab):
+
 ![result_random_walk](./result_random_walk.gif)

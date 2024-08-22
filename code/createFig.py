@@ -45,4 +45,3 @@ if __name__ == "__main__":
         frameList.append(imageio.imread("fig/fig" + figNameAppendix + str(i) + ".png"))
     imageio.mimsave("result" + figNameAppendix + ".gif", frameList, "GIF", duration = 0.03)
     print("creating figures finished, check directories fig/ and ./")
-    
